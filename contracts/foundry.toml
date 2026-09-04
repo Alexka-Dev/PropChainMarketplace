@@ -1,0 +1,31 @@
+[profile.default]
+src = "src"
+test = "test"
+script = "script"
+out = "out"
+libs = ["lib", "node_modules"]
+
+# Versión del compilador fijada a 0.8.29
+solc_version = "0.8.29"
+
+# Evita que Foundry compile tests y harnesses de dependencias en lib/
+ignored_error_codes = ["license", "code-size"]
+skip = [
+    "lib/openzeppelin-contracts/test/**",
+    "lib/openzeppelin-contracts/fv/**",
+    "lib/openzeppelin-contracts/test/**",
+    "lib/openzeppelin-contracts/fv/**"
+]
+
+remappings = [
+    'forge-std/=lib/forge-std/src/',
+    '@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/',
+    'openzeppelin-contracts/=lib/openzeppelin-contracts/contracts/',
+    '@src/=src/',
+    '@mocks/=test/mocks/',
+    '@interfaces/=src/Interfaces/'
+]
+
+no_match_coverage = ".*(script|test|mocks).*"
+
+
