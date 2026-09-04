@@ -23,10 +23,12 @@ contract MockNFT is ERC721, IERC2981 {
     }
 
     // Soporte para ERC-2981 (Regalías)
-    function royaltyInfo(
-        uint256,
-        uint256 salePrice
-    ) external view override returns (address receiver, uint256 royaltyAmount) {
+    function royaltyInfo(uint256, uint256 salePrice)
+        external
+        view
+        override
+        returns (address receiver, uint256 royaltyAmount)
+    {
         receiver = _royaltyReceiver;
         royaltyAmount = (salePrice * _royaltyBps) / 10000;
     }

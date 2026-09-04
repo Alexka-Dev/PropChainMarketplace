@@ -46,12 +46,10 @@ contract PropertiesCollection is ERC721, Ownable {
     // Constructor
     // ---------------------------------------------------------
 
-    constructor(
-        string memory name_,
-        string memory symbol_,
-        uint256 maxSupply_,
-        string memory baseUri_
-    ) ERC721(name_, symbol_) Ownable(msg.sender) {
+    constructor(string memory name_, string memory symbol_, uint256 maxSupply_, string memory baseUri_)
+        ERC721(name_, symbol_)
+        Ownable(msg.sender)
+    {
         MAX_SUPPLY = maxSupply_;
         baseUri = baseUri_;
     }
@@ -63,7 +61,6 @@ contract PropertiesCollection is ERC721, Ownable {
         baseUri = newBaseUri_;
         emit BaseURIUpdated(newBaseUri_);
     }
-
 
     // ---------------------------------------------------------
     // External Minting Logic
@@ -88,19 +85,17 @@ contract PropertiesCollection is ERC721, Ownable {
         return newId;
     }
 
-        // ---------------------------------------------------------
+    // ---------------------------------------------------------
     // Frontend Read Helpers (Useful for Wagmi hooks)
     // ---------------------------------------------------------
 
-     /**
+    /**
      * @notice Returns total minted properties so far.
      */
     function totalSupply() external view returns (uint256) {
         return currentTokenId;
     }
 
-
- 
     /**
      * @notice Returns complete URI for a given token ID.
      */
@@ -110,11 +105,7 @@ contract PropertiesCollection is ERC721, Ownable {
         return bytes(base).length > 0 ? string.concat(base, tokenId.toString(), ".json") : "";
     }
 
-
     function _baseURI() internal view override returns (string memory) {
         return baseUri;
     }
-
-
-
 }

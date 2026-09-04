@@ -2,7 +2,6 @@
 /* solhint-disable */
 pragma solidity 0.8.29;
 
-
 import {Test, console} from "forge-std/Test.sol";
 import {Presale} from "@src/Presale.sol";
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
@@ -45,7 +44,6 @@ contract RejectETH {
     function withdraw(Presale presale) external {
         presale.emergencyWithdraw(address(0));
     }
-
 }
 
 contract PresaleTest is Test {
@@ -60,14 +58,11 @@ contract PresaleTest is Test {
     address public blacklistedUser = address(0x200);
 
     int256 constant INITIAL_ETH_PRICE = 3000 * 1e8; // $3,000 USD (8 dec)
-    uint256 constant TOKEN_PRICE_USD = 50000000;    // $0.50 USD (8 dec)
+    uint256 constant TOKEN_PRICE_USD = 50000000; // $0.50 USD (8 dec)
     uint256 constant INITIAL_TOKENS = 10_000_000 * 1e18; // 10M CPT
 
     event TokensPurchased(
-        address indexed buyer,
-        address indexed assetAddress,
-        uint256 amountSpent,
-        uint256 tokensAllocated
+        address indexed buyer, address indexed assetAddress, uint256 amountSpent, uint256 tokensAllocated
     );
 
     event SetPaused(bool indexed isPaused);
@@ -81,12 +76,7 @@ contract PresaleTest is Test {
         usdc = new MockStablecoin("USD Coin", "USDC");
         ethPriceFeed = new MockAggregator(8, INITIAL_ETH_PRICE);
 
-        presale = new Presale(
-            address(saleToken),
-            address(usdt),
-            address(usdc),
-            address(ethPriceFeed)
-        );
+        presale = new Presale(address(saleToken), address(usdt), address(usdc), address(ethPriceFeed));
 
         saleToken.mint(address(presale), INITIAL_TOKENS);
 
@@ -156,12 +146,7 @@ contract PresaleTest is Test {
 
     function test_BuyWithETH_RevertsIfInsufficientContractBalance() public {
         // Create a new presale with 0 tokens
-        Presale emptyPresale = new Presale(
-            address(saleToken),
-            address(usdt),
-            address(usdc),
-            address(ethPriceFeed)
-        );
+        Presale emptyPresale = new Presale(address(saleToken), address(usdt), address(usdc), address(ethPriceFeed));
 
         vm.prank(buyer);
         vm.expectRevert(Presale.InsufficientContractBalance.selector);
@@ -207,12 +192,7 @@ contract PresaleTest is Test {
     }
 
     function test_BuyWithStablecoin_RevertsIfInsufficientContractBalance() public {
-        Presale emptyPresale = new Presale(
-            address(saleToken),
-            address(usdt),
-            address(usdc),
-            address(ethPriceFeed)
-        );
+        Presale emptyPresale = new Presale(address(saleToken), address(usdt), address(usdc), address(ethPriceFeed));
 
         vm.prank(buyer);
         vm.expectRevert(Presale.InsufficientContractBalance.selector);

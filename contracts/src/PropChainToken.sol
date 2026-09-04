@@ -12,13 +12,12 @@ import {AccessControl} from "@openzeppelin/contracts/access/AccessControl.sol";
  * @dev Includes AccessControl, supply capping, and blacklisting features for compliance.
  */
 contract PropChainToken is ERC20, ERC20Burnable, AccessControl {
-
     // ---------------------------------------------------------
     // 1. Roles & Immutable Variables
     // ---------------------------------------------------------
 
     bytes32 public constant BLACKLIST_OPERATOR = keccak256("BLACKLIST_OPERATOR");
-    
+
     /// @notice Absolute maximum supply of tokens (in smallest unit / wei).
     uint256 public immutable CAP;
 
@@ -53,12 +52,9 @@ contract PropChainToken is ERC20, ERC20Burnable, AccessControl {
      * @param cap_ Strict supply limit IN WEI (include 18 decimals in parameter).
      * @param initialReceiver Wallet address to receive the initial minted supply.
      */
-    constructor(
-        string memory name_,
-        string memory symbol_,
-        uint256 cap_,
-        address initialReceiver
-    ) ERC20(name_, symbol_) {
+    constructor(string memory name_, string memory symbol_, uint256 cap_, address initialReceiver)
+        ERC20(name_, symbol_)
+    {
         if (initialReceiver == address(0)) revert InvalidAddress();
 
         CAP = cap_;
@@ -117,11 +113,7 @@ contract PropChainToken is ERC20, ERC20Burnable, AccessControl {
     /**
      * @dev Hook that intercepts all token transfers, mints, and burns.
      */
-    function _update(
-        address from,
-        address to,
-        uint256 amount
-    ) internal virtual override(ERC20) {
+    function _update(address from, address to, uint256 amount) internal virtual override(ERC20) {
         if (blacklist[from]) revert AddressBlacklisted(from);
         if (blacklist[to]) revert AddressBlacklisted(to);
 
@@ -132,7 +124,7 @@ contract PropChainToken is ERC20, ERC20Burnable, AccessControl {
                 revert CapExceeded(projectedSupply, CAP);
             }
         }
-        
+
         super._update(from, to, amount);
     }
 }

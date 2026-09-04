@@ -30,12 +30,12 @@ contract FractionalVault is AccessControl, ReentrancyGuard {
      *      Slot 4: bool (1B) + padding
      */
     struct Vault {
-        address propertyOwner;    // 20 bytes \ Slot 1
-        uint96 totalFractions;    // 12 bytes / (Suma 32 bytes)
-        address nftAddress;       // 20 bytes \ Slot 2
-        uint96 pricePerFraction;  // 12 bytes / (Suma 32 bytes)
-        uint256 propertyId;       // 32 bytes (Slot 3)
-        bool isFractionalized;    // 1 byte   (Slot 4)
+        address propertyOwner; // 20 bytes \ Slot 1
+        uint96 totalFractions; // 12 bytes / (Suma 32 bytes)
+        address nftAddress; // 20 bytes \ Slot 2
+        uint96 pricePerFraction; // 12 bytes / (Suma 32 bytes)
+        uint256 propertyId; // 32 bytes (Slot 3)
+        bool isFractionalized; // 1 byte   (Slot 4)
     }
 
     // ---------------------------------------------------------
@@ -67,17 +67,10 @@ contract FractionalVault is AccessControl, ReentrancyGuard {
     );
 
     event FractionsPurchased(
-        uint256 indexed propertyId,
-        address indexed buyer,
-        uint256 indexed amount,
-        uint256 totalPrice
+        uint256 indexed propertyId, address indexed buyer, uint256 indexed amount, uint256 totalPrice
     );
 
-    event FractionsRedeemed(
-        uint256 indexed propertyId,
-        address indexed redeemer,
-        uint256 amount
-    );
+    event FractionsRedeemed(uint256 indexed propertyId, address indexed redeemer, uint256 amount);
 
     // ---------------------------------------------------------
     // 5. Custom Errors
@@ -91,16 +84,8 @@ contract FractionalVault is AccessControl, ReentrancyGuard {
     // Constructor
     // ---------------------------------------------------------
 
-    constructor(
-        address complianceRegistry_,
-        address propChainToken_,
-        address admin_
-    ) {
-        if (
-            complianceRegistry_ == address(0) ||
-            propChainToken_ == address(0) ||
-            admin_ == address(0)
-        ) {
+    constructor(address complianceRegistry_, address propChainToken_, address admin_) {
+        if (complianceRegistry_ == address(0) || propChainToken_ == address(0) || admin_ == address(0)) {
             revert InvalidAddress();
         }
 

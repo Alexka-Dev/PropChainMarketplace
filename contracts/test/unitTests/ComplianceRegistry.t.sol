@@ -68,9 +68,7 @@ contract ComplianceRegistryTest is Test {
         vm.prank(unauthorized);
         vm.expectRevert(
             abi.encodeWithSelector(
-                IAccessControl.AccessControlUnauthorizedAccount.selector,
-                unauthorized,
-                VERIFIER_ROLE
+                IAccessControl.AccessControlUnauthorizedAccount.selector, unauthorized, VERIFIER_ROLE
             )
         );
         registry.verifyUser(user1, KYC_URI);

@@ -22,7 +22,7 @@ contract PresaleIntegrationTest is Test {
     address public usdt = address(0x1111);
     address public usdc = address(0x1222);
 
-    address public admin = address(0xAD1);   
+    address public admin = address(0xAD1);
     address public treasury = address(0x1EA5);
     address public seller = address(0x5E11);
     address public buyer1 = address(0xB11);
@@ -40,28 +40,13 @@ contract PresaleIntegrationTest is Test {
     function setUp() public {
         vm.startPrank(admin);
 
-        token = new PropChainToken(
-            TOKEN_NAME,
-            TOKEN_SYMBOL,
-            INITIAL_SUPPLY,
-            admin
-        );
+        token = new PropChainToken(TOKEN_NAME, TOKEN_SYMBOL, INITIAL_SUPPLY, admin);
 
-        collection = new PropertiesCollection(
-            "PropChain Properties",
-            "PCP",
-            MAX_NFT_SUPPLY,
-            BASE_URI
-        );
+        collection = new PropertiesCollection("PropChain Properties", "PCP", MAX_NFT_SUPPLY, BASE_URI);
 
         priceFeed = new MockAggregator(8, 3000 * 1e8);
 
-        presale = new Presale(
-            address(token),      
-            usdt,                
-            usdc,                
-            address(priceFeed)
-        );
+        presale = new Presale(address(token), usdt, usdc, address(priceFeed));
 
         // Transfer the token allocation to the presale
         bool success = token.transfer(address(presale), PRESALE_TOKEN_ALLOCATION);
@@ -99,11 +84,10 @@ contract PresaleIntegrationTest is Test {
         assertEq(token.balanceOf(address(presale)), PRESALE_TOKEN_ALLOCATION);
 
         // Step 3: Si la presale tiene un método de compra con ETH (ej. buyWithETH):
-      
+
         vm.prank(buyer1);
         presale.buyWithETH{value: 1 ether}();
         assertGt(token.balanceOf(buyer1), 0);
-       
     }
 
     /**
@@ -122,9 +106,7 @@ contract PresaleIntegrationTest is Test {
 
         // Direct transfer of tokens to buyer1 should fail
         vm.prank(admin);
-        vm.expectRevert(
-            abi.encodeWithSelector(PropChainToken.AddressBlacklisted.selector, buyer1)
-        );
+        vm.expectRevert(abi.encodeWithSelector(PropChainToken.AddressBlacklisted.selector, buyer1));
         token.transfer(buyer1, 100 * 1e18);
     }
 }

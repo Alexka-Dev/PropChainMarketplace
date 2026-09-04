@@ -74,17 +74,10 @@ contract PropertyFactory is AccessControl, ReentrancyGuard {
     // Constructor
     // ---------------------------------------------------------
 
-    constructor(
-        address propertyCollection_,
-        address fractionalVault_,
-        address complianceRegistry_,
-        address admin_
-    ) {
+    constructor(address propertyCollection_, address fractionalVault_, address complianceRegistry_, address admin_) {
         if (
-            propertyCollection_ == address(0) ||
-            fractionalVault_ == address(0) ||
-            complianceRegistry_ == address(0) ||
-            admin_ == address(0)
+            propertyCollection_ == address(0) || fractionalVault_ == address(0) || complianceRegistry_ == address(0)
+                || admin_ == address(0)
         ) {
             revert ZeroAddressDetected();
         }
@@ -107,11 +100,12 @@ contract PropertyFactory is AccessControl, ReentrancyGuard {
      * @param totalFractions_ Cantidad total de cuotas en las que se dividirá la propiedad.
      * @param pricePerFraction_ Precio por fracción en USDC (mínimo 100 USDC).
      */
-    function createAndFractionalizeProperty(
-        address propertyOwner_,
-        uint256 totalFractions_,
-        uint256 pricePerFraction_
-    ) external onlyRole(VERIFIER_ROLE) nonReentrant returns (uint256 propertyTokenId, uint256 vaultId) {
+    function createAndFractionalizeProperty(address propertyOwner_, uint256 totalFractions_, uint256 pricePerFraction_)
+        external
+        onlyRole(VERIFIER_ROLE)
+        nonReentrant
+        returns (uint256 propertyTokenId, uint256 vaultId)
+    {
         // --- CHECKS ---
         if (propertyOwner_ == address(0)) revert ZeroAddressDetected();
         if (!complianceRegistry.isVerified(propertyOwner_)) revert OwnerNotKYCVerified(propertyOwner_);
@@ -127,18 +121,11 @@ contract PropertyFactory is AccessControl, ReentrancyGuard {
 
         // 3. Depositar el NFT en la bóveda e iniciar el fraccionamiento
         vaultId = fractionalVault.fractionalizeProperty(
-            address(propertyCollection),
-            propertyTokenId,
-            totalFractions_,
-            pricePerFraction_
+            address(propertyCollection), propertyTokenId, totalFractions_, pricePerFraction_
         );
 
         emit PropertyCreatedAndFractionalized(
-            propertyTokenId,
-            vaultId,
-            propertyOwner_,
-            totalFractions_,
-            pricePerFraction_
+            propertyTokenId, vaultId, propertyOwner_, totalFractions_, pricePerFraction_
         );
 
         return (propertyTokenId, vaultId);

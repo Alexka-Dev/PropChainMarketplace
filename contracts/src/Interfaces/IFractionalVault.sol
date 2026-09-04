@@ -26,12 +26,7 @@ interface IFractionalVault is IERC1155 {
         uint256 pricePerFraction
     );
 
-    event FractionsPurchased(
-        uint256 indexed vaultId,
-        address indexed buyer,
-        uint256 amount,
-        uint256 totalPrice
-    );
+    event FractionsPurchased(uint256 indexed vaultId, address indexed buyer, uint256 amount, uint256 totalPrice);
 
     function fractionalizeProperty(
         address propertyContract,

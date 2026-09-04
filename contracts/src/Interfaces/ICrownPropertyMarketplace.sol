@@ -38,11 +38,7 @@ interface ICrownPropertyMarketplace {
         uint256 royaltyFee
     );
 
-    event PropertyCanceled(
-        address indexed seller,
-        address indexed nftAddress,
-        uint256 indexed tokenId
-    );
+    event PropertyCanceled(address indexed seller, address indexed nftAddress, uint256 indexed tokenId);
 
     function listProperty(
         address nftAddress_,

@@ -85,17 +85,10 @@ contract YieldDistributor is AccessControl, ReentrancyGuard {
     // Constructor
     // ---------------------------------------------------------
 
-    constructor(
-        address paymentToken_,
-        address fractionalVault_,
-        address complianceRegistry_,
-        address admin_
-    ) {
+    constructor(address paymentToken_, address fractionalVault_, address complianceRegistry_, address admin_) {
         if (
-            paymentToken_ == address(0) ||
-            fractionalVault_ == address(0) ||
-            complianceRegistry_ == address(0) ||
-            admin_ == address(0)
+            paymentToken_ == address(0) || fractionalVault_ == address(0) || complianceRegistry_ == address(0)
+                || admin_ == address(0)
         ) {
             revert ZeroAddressDetected();
         }
@@ -117,10 +110,7 @@ contract YieldDistributor is AccessControl, ReentrancyGuard {
      * @param vaultId_ ID del inmueble / Vault fraccionado.
      * @param amount_ Monto total en USDC transferido para distribución.
      */
-    function depositYield(
-        uint256 vaultId_,
-        uint256 amount_
-    ) external onlyRole(ESCROW_ROLE) nonReentrant {
+    function depositYield(uint256 vaultId_, uint256 amount_) external onlyRole(ESCROW_ROLE) nonReentrant {
         // --- CHECKS ---
         if (amount_ == 0) revert ZeroAmount();
 

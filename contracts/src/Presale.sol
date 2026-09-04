@@ -10,13 +10,7 @@ interface IAggregatorV3Interface {
     function latestRoundData()
         external
         view
-        returns (
-            uint80 roundId,
-            int256 answer,
-            uint256 startedAt,
-            uint256 updatedAt,
-            uint80 answeredInRound
-        );
+        returns (uint80 roundId, int256 answer, uint256 startedAt, uint256 updatedAt, uint80 answeredInRound);
 }
 
 /// @dev Interfaz local mínima para verificar listas negras en el token nativo.
@@ -53,10 +47,7 @@ contract Presale is Ownable {
     // ---------------------------------------------------------
 
     event TokensPurchased(
-        address indexed buyer, 
-        address indexed assetAddress, 
-        uint256 indexed amountSpent, 
-        uint256 tokensAllocated
+        address indexed buyer, address indexed assetAddress, uint256 indexed amountSpent, uint256 tokensAllocated
     );
 
     event SetPaused(bool indexed isPaused);
@@ -96,12 +87,7 @@ contract Presale is Ownable {
      * @param usdc_ Address of USDC contract.
      * @param priceFeed_ Address of Chainlink ETH/USD Price Feed aggregator.
      */
-    constructor(
-        address saleToken_,
-        address usdt_,
-        address usdc_,
-        address priceFeed_
-    ) Ownable(msg.sender) {
+    constructor(address saleToken_, address usdt_, address usdc_, address priceFeed_) Ownable(msg.sender) {
         if (saleToken_ == address(0)) revert InvalidAddress();
         if (usdt_ == address(0)) revert InvalidAddress();
         if (usdc_ == address(0)) revert InvalidAddress();
@@ -123,7 +109,7 @@ contract Presale is Ownable {
     function buyWithETH() external payable whenNotPaused {
         uint256 amountSpent = msg.value;
         if (amountSpent == 0) revert InvalidAmount();
-        
+
         // Check blacklist on token contract via local interface casting
         if (IBlacklistable(address(SALE_TOKEN)).isBlacklisted(msg.sender)) {
             revert UserIsBlacklisted();
@@ -150,7 +136,7 @@ contract Presale is Ownable {
             revert UnsupportedStablecoin();
         }
         if (amount == 0) revert InvalidAmount();
-        
+
         // Check blacklist on token contract via local interface casting
         if (IBlacklistable(address(SALE_TOKEN)).isBlacklisted(msg.sender)) {
             revert UserIsBlacklisted();
@@ -200,7 +186,7 @@ contract Presale is Ownable {
             uint256 balance = address(this).balance;
             require(balance > 0, EmptyBalance());
 
-            (bool success, ) = payable(owner()).call{value: balance}("");
+            (bool success,) = payable(owner()).call{value: balance}("");
             require(success, ETHTransferFailed());
         } else {
             IERC20 token = IERC20(asset);
@@ -222,10 +208,10 @@ contract Presale is Ownable {
     function getLatestEthPrice() public view returns (uint256) {
         (uint80 roundId, int256 price,, uint256 updateAt, uint80 answeredInRound) = ETH_USD_PRICE_FEED.latestRoundData();
         require(price > 0, InvalidOraclePrice());
-        
+
         // Uso de desigualdades estrictas (>) para optimización de gas
         require(updateAt != 0 && answeredInRound > roundId - 1, StaleOraclePrice());
-        
+
         // Reemplazo de '<= 3 hours' por '< 3 hours + 1' (10801 segundos) para la regla gas-strict-inequalities
         // forge-lint: disable-next-line(block-timestamp)
         require(block.timestamp - updateAt < 3 hours + 1, StaleOraclePrice());
@@ -254,10 +240,10 @@ contract Presale is Ownable {
      */
     function calculateStablecoinPurchase(uint256 stableAmount) public view returns (uint256) {
         if (stableAmount == 0) return 0;
-        
+
         // Scale 6 decimals to 8 decimals precision: stableAmount * 10^2
         uint256 stableInUsd8Decimals = stableAmount * 100;
-        
+
         // CPT Tokens = (stableInUsd8Decimals [8 dec] * 1e18) / tokenPriceInUsd [8 dec]
         return (stableInUsd8Decimals * 1e18) / tokenPriceInUsd;
     }

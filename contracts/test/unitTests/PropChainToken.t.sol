@@ -10,12 +10,9 @@ import {IAccessControl} from "@openzeppelin/contracts/access/IAccessControl.sol"
 
 /// @dev Harness para exponer la función interna _update y probar mints excedentes de CAP directamente
 contract PropChainTokenHarness is PropChainToken {
-    constructor(
-        string memory name_,
-        string memory symbol_,
-        uint256 cap_,
-        address initialReceiver
-    ) PropChainToken(name_, symbol_, cap_, initialReceiver) {}
+    constructor(string memory name_, string memory symbol_, uint256 cap_, address initialReceiver)
+        PropChainToken(name_, symbol_, cap_, initialReceiver)
+    {}
 
     function exposed_update(address from, address to, uint256 amount) external {
         _update(from, to, amount);
@@ -36,12 +33,7 @@ contract PropChainTokenTest is Test {
     event RemovedFromBlacklist(address indexed account);
 
     function setUp() public {
-        token = new PropChainToken(
-            "PropChain Token",
-            "CPT",
-            TOKEN_CAP,
-            user1
-        );
+        token = new PropChainToken("PropChain Token", "CPT", TOKEN_CAP, user1);
 
         // Conceder rol de operador de lista negra a `operator`
         token.grantRole(token.BLACKLIST_OPERATOR(), operator);
@@ -77,11 +69,7 @@ contract PropChainTokenTest is Test {
         bytes32 operatorRole = token.BLACKLIST_OPERATOR();
 
         vm.expectRevert(
-            abi.encodeWithSelector(
-                IAccessControl.AccessControlUnauthorizedAccount.selector,
-                nonOperator,
-                operatorRole
-            )
+            abi.encodeWithSelector(IAccessControl.AccessControlUnauthorizedAccount.selector, nonOperator, operatorRole)
         );
 
         vm.prank(nonOperator);
@@ -114,11 +102,7 @@ contract PropChainTokenTest is Test {
         token.addToBlacklist(address(0x200));
 
         vm.expectRevert(
-            abi.encodeWithSelector(
-                IAccessControl.AccessControlUnauthorizedAccount.selector,
-                nonOperator,
-                operatorRole
-            )
+            abi.encodeWithSelector(IAccessControl.AccessControlUnauthorizedAccount.selector, nonOperator, operatorRole)
         );
 
         vm.prank(nonOperator);
@@ -154,9 +138,7 @@ contract PropChainTokenTest is Test {
         token.addToBlacklist(user1);
 
         vm.prank(user1);
-        vm.expectRevert(
-            abi.encodeWithSelector(PropChainToken.AddressBlacklisted.selector, user1)
-        );
+        vm.expectRevert(abi.encodeWithSelector(PropChainToken.AddressBlacklisted.selector, user1));
         token.transfer(user2, 100 * 1e18);
     }
 
@@ -165,9 +147,7 @@ contract PropChainTokenTest is Test {
         token.addToBlacklist(user2);
 
         vm.prank(user1);
-        vm.expectRevert(
-            abi.encodeWithSelector(PropChainToken.AddressBlacklisted.selector, user2)
-        );
+        vm.expectRevert(abi.encodeWithSelector(PropChainToken.AddressBlacklisted.selector, user2));
         token.transfer(user2, 100 * 1e18);
     }
 
@@ -211,12 +191,7 @@ contract PropChainTokenTest is Test {
     function test_CapExceeded_RevertsIfProjectedSupplyExceedsCap() public {
         uint256 lowCap = 1_000 * 1e18;
 
-        PropChainTokenHarness harness = new PropChainTokenHarness(
-            "Harness",
-            "HAR",
-            lowCap,
-            user1
-        );
+        PropChainTokenHarness harness = new PropChainTokenHarness("Harness", "HAR", lowCap, user1);
 
         vm.prank(user1);
         harness.burn(100 * 1e18);
@@ -224,13 +199,7 @@ contract PropChainTokenTest is Test {
         uint256 requestedAmount = 200 * 1e18;
         uint256 projectedSupply = harness.totalSupply() + requestedAmount;
 
-        vm.expectRevert(
-            abi.encodeWithSelector(
-                PropChainToken.CapExceeded.selector,
-                projectedSupply,
-                lowCap
-            )
-        );
+        vm.expectRevert(abi.encodeWithSelector(PropChainToken.CapExceeded.selector, projectedSupply, lowCap));
         harness.exposed_update(address(0), user2, requestedAmount);
     }
 

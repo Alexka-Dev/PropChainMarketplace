@@ -37,15 +37,15 @@ contract RentalEscrow is AccessControl, ReentrancyGuard {
     // ---------------------------------------------------------
 
     struct LeaseAgreement {
-        uint256 propertyId;         // ID de la propiedad / Vault asociado
-        address tenant;             // Dirección del inquilino (debe tener KYC)
-        address yieldDistributor;   // Contrato receptor de las rentas para los inversores
-        uint256 monthlyRent;        // Canon de arrendamiento mensual (en USDC)
-        uint256 securityDeposit;     // Depósito de garantía/fianza (en USDC)
-        uint256 rentDueTimestamp;   // Fecha límite para el próximo pago
-        uint256 leaseEndTimestamp;  // Fecha de finalización del contrato de alquiler
-        uint256 totalPaid;          // Total acumulado pagado en el alquiler
-        AgreementStatus status;     // Estado del contrato de arrendamiento
+        uint256 propertyId; // ID de la propiedad / Vault asociado
+        address tenant; // Dirección del inquilino (debe tener KYC)
+        address yieldDistributor; // Contrato receptor de las rentas para los inversores
+        uint256 monthlyRent; // Canon de arrendamiento mensual (en USDC)
+        uint256 securityDeposit; // Depósito de garantía/fianza (en USDC)
+        uint256 rentDueTimestamp; // Fecha límite para el próximo pago
+        uint256 leaseEndTimestamp; // Fecha de finalización del contrato de alquiler
+        uint256 totalPaid; // Total acumulado pagado en el alquiler
+        AgreementStatus status; // Estado del contrato de arrendamiento
     }
 
     /// @notice Token de pago oficial (USDC con 6 decimales).
@@ -73,12 +73,7 @@ contract RentalEscrow is AccessControl, ReentrancyGuard {
         uint256 leaseEndTimestamp
     );
 
-    event RentPaid(
-        uint256 indexed leaseId,
-        address indexed tenant,
-        uint256 amount,
-        uint256 nextDueTimestamp
-    );
+    event RentPaid(uint256 indexed leaseId, address indexed tenant, uint256 amount, uint256 nextDueTimestamp);
 
     event LeaseEnded(uint256 indexed leaseId, address indexed tenant, uint256 depositRefunded);
     event LeaseDisputed(uint256 indexed leaseId, string reason);
@@ -100,11 +95,7 @@ contract RentalEscrow is AccessControl, ReentrancyGuard {
     // Constructor
     // ---------------------------------------------------------
 
-    constructor(
-        address paymentToken_,
-        address complianceRegistry_,
-        address admin_
-    ) {
+    constructor(address paymentToken_, address complianceRegistry_, address admin_) {
         if (paymentToken_ == address(0) || complianceRegistry_ == address(0) || admin_ == address(0)) {
             revert ZeroAddressDetected();
         }
@@ -226,11 +217,11 @@ contract RentalEscrow is AccessControl, ReentrancyGuard {
     /**
      * @notice Permite al árbitro/admin intervenir en caso de daños o disputas en la propiedad.
      */
-    function resolveDispute(
-        uint256 leaseId_,
-        uint256 amountToTenant,
-        uint256 amountToDistributor
-    ) external onlyRole(ARBITER_ROLE) nonReentrant {
+    function resolveDispute(uint256 leaseId_, uint256 amountToTenant, uint256 amountToDistributor)
+        external
+        onlyRole(ARBITER_ROLE)
+        nonReentrant
+    {
         LeaseAgreement storage lease = leaseAgreements[leaseId_];
         if (lease.status != AgreementStatus.Active) revert LeaseNotActive();
 

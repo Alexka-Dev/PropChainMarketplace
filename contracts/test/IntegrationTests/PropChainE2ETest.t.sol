@@ -30,27 +30,17 @@ contract PropChainE2ETest is Test {
         // 1. Mocks & Infra
         compliance = new MockComplianceRegistry();
         priceFeed = new MockAggregator(8, 3000 * 1e8); // ETH = $3,000 USD
-        
+
         propChainToken = new MockERC20("PropChain Token", "CPT", 18);
         usdc = new MockERC20("USD Coin", "USDC", 6);
         usdt = new MockERC20("Tether USD", "USDT", 6);
         propertyNFT = new MockNFT();
 
         // 2. Deploy Contratos Principales
-        presale = new Presale(
-            address(propChainToken),
-            address(usdt),
-            address(usdc),
-            address(priceFeed)
-        );
+        presale = new Presale(address(propChainToken), address(usdt), address(usdc), address(priceFeed));
 
-        marketplace = new PropChainMarketplace(
-            address(propChainToken),
-            address(usdc),
-            address(usdt),
-            address(compliance),
-            admin
-        );
+        marketplace =
+            new PropChainMarketplace(address(propChainToken), address(usdc), address(usdt), address(compliance), admin);
 
         // 3. Setup KYC & Tokens
         compliance.setVerified(seller, true);
@@ -67,7 +57,7 @@ contract PropChainE2ETest is Test {
         vm.deal(buyer, 10 ether);
         vm.startPrank(buyer);
         presale.buyWithETH{value: 1 ether}();
-        
+
         uint256 buyerBalance = propChainToken.balanceOf(buyer);
         assertTrue(buyerBalance > 0, "Buyer should have received CPT tokens");
         vm.stopPrank();
@@ -79,12 +69,7 @@ contract PropChainE2ETest is Test {
 
         uint256 listingPrice = 1_000 * 1e18; // 1,000 CPT
         marketplace.listProperty{value: 0.01 ether}(
-            address(propertyNFT),
-            1,
-            1,
-            listingPrice,
-            address(propChainToken),
-            false
+            address(propertyNFT), 1, 1, listingPrice, address(propChainToken), false
         );
         vm.stopPrank();
 

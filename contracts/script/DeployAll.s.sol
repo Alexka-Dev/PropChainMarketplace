@@ -42,21 +42,13 @@ contract DeployAll is Script {
 
         // PASO 1: Colección NFT
         PropertiesCollection collection = new PropertiesCollection(
-            "PropChain Collection",
-            "PCT",
-            10,
-            "ipfs://QmXoypizjW3WknFiJnKLwHCnL72vedxjQkDDP1mXWo6uco/"
+            "PropChain Collection", "PCT", 10, "ipfs://QmXoypizjW3WknFiJnKLwHCnL72vedxjQkDDP1mXWo6uco/"
         );
         console2.log("PropertiesCollection deployed at:", address(collection));
 
         // PASO 2: Token de Fracciones
         uint256 totalFractions = 100_000;
-        PropChainToken tokenProperty0 = new PropChainToken(
-            "Apartment 4B Miami",
-            "CPT",
-            totalFractions,
-            deployerAddress
-        );
+        PropChainToken tokenProperty0 = new PropChainToken("Apartment 4B Miami", "CPT", totalFractions, deployerAddress);
         console2.log("PropChainToken deployed at:", address(tokenProperty0));
 
         // PASO 3: Marketplace (Requiere 5 argumentos: initialPropChainToken, usdcAddress, usdtAddress, complianceRegistry, admin)
@@ -65,17 +57,12 @@ contract DeployAll is Script {
             usdcTestnet,
             usdtTestnet,
             deployerAddress, // Compliance Registry temporal
-            deployerAddress  // Admin
+            deployerAddress // Admin
         );
         console2.log("PropChainMarketplace deployed at:", address(marketplace));
 
         // PASO 4: Despliegue de la Preventa
-        Presale presale = new Presale(
-            address(tokenProperty0),
-            usdtTestnet,
-            usdcTestnet,
-            ethUsdPriceFeed
-        );
+        Presale presale = new Presale(address(tokenProperty0), usdtTestnet, usdcTestnet, ethUsdPriceFeed);
         console2.log("Presale deployed at:", address(presale));
 
         // PASO 5: Transferir tokens a la Preventa para financiarla

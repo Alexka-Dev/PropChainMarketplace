@@ -34,10 +34,10 @@ contract PropChainMarketplace is AccessControl, ReentrancyGuard {
         address seller;
         address nftAddress;
         uint256 tokenId;
-        uint256 amount;       // Cantidad (1 para ERC721, N para fracciones ERC1155)
-        uint256 price;        // Precio total o unitario según la configuración de venta
-        address payToken;     // Token de pago (address(0) para ETH Nativo)
-        bool isERC1155;       // True si es un token fraccionado ERC-1155
+        uint256 amount; // Cantidad (1 para ERC721, N para fracciones ERC1155)
+        uint256 price; // Precio total o unitario según la configuración de venta
+        address payToken; // Token de pago (address(0) para ETH Nativo)
+        bool isERC1155; // True si es un token fraccionado ERC-1155
     }
 
     // ---------------------------------------------------------
@@ -100,17 +100,10 @@ contract PropChainMarketplace is AccessControl, ReentrancyGuard {
         uint256 royaltyFee
     );
 
-    event PropertyCanceled(
-        address indexed seller,
-        address indexed nftAddress,
-        uint256 indexed tokenId
-    );
+    event PropertyCanceled(address indexed seller, address indexed nftAddress, uint256 indexed tokenId);
 
     event ListingPriceUpdated(
-        address indexed seller,
-        address indexed nftAddress,
-        uint256 indexed tokenId,
-        uint256 newPrice
+        address indexed seller, address indexed nftAddress, uint256 indexed tokenId, uint256 newPrice
     );
 
     event PaymentTokenStatusUpdated(address indexed token, bool indexed status);
@@ -156,11 +149,7 @@ contract PropChainMarketplace is AccessControl, ReentrancyGuard {
         address complianceRegistry_,
         address admin_
     ) {
-        if (
-            initialPropChainToken == address(0) ||
-            complianceRegistry_ == address(0) ||
-            admin_ == address(0)
-        ) {
+        if (initialPropChainToken == address(0) || complianceRegistry_ == address(0) || admin_ == address(0)) {
             revert InvalidAddress();
         }
 
@@ -213,19 +202,11 @@ contract PropChainMarketplace is AccessControl, ReentrancyGuard {
         });
 
         if (msg.value > 0) {
-            (bool success, ) = feeRecipient.call{value: msg.value}("");
+            (bool success,) = feeRecipient.call{value: msg.value}("");
             if (!success) revert TransferFailed();
         }
 
-        emit PropertyListed(
-            msg.sender,
-            nftAddress_,
-            tokenId_,
-            amount_,
-            price_,
-            payToken_,
-            isERC1155_
-        );
+        emit PropertyListed(msg.sender, nftAddress_, tokenId_, amount_, price_, payToken_, isERC1155_);
     }
 
     /**
@@ -243,11 +224,7 @@ contract PropChainMarketplace is AccessControl, ReentrancyGuard {
     /**
      * @notice Actualiza el precio de una publicación existente.
      */
-    function updateListingPrice(
-        address nftAddress_,
-        uint256 tokenId_,
-        uint256 newPrice_
-    ) external {
+    function updateListingPrice(address nftAddress_, uint256 tokenId_, uint256 newPrice_) external {
         if (newPrice_ == 0) revert PriceMustBeGreaterThanZero();
 
         Listing storage listedItem = listings[nftAddress_][tokenId_];
@@ -271,32 +248,27 @@ contract PropChainMarketplace is AccessControl, ReentrancyGuard {
         delete listings[nftAddress_][tokenId_];
 
         uint256 protocolFee = (listedItem.price * protocolFeeBps) / BPS_DENOMINATOR;
-        
+
         (address royaltyReceiver, uint256 royaltyFee) = _calculateRoyalty(nftAddress_, tokenId_, listedItem.price);
         uint256 sellerAmount = listedItem.price - protocolFee - royaltyFee;
 
         // Transferencia del activo NFT / ERC1155
         if (listedItem.isERC1155) {
-            IERC1155(nftAddress_).safeTransferFrom(
-                listedItem.seller,
-                msg.sender,
-                listedItem.tokenId,
-                listedItem.amount,
-                ""
-            );
+            IERC1155(nftAddress_)
+                .safeTransferFrom(listedItem.seller, msg.sender, listedItem.tokenId, listedItem.amount, "");
         } else {
-            IERC721(nftAddress_).safeTransferFrom(
-                listedItem.seller,
-                msg.sender,
-                listedItem.tokenId
-            );
+            IERC721(nftAddress_).safeTransferFrom(listedItem.seller, msg.sender, listedItem.tokenId);
         }
 
         // Transferencia de fondos (ETH o ERC20)
         if (listedItem.payToken == ETH_ADDRESS) {
-            _processETHPayment(listedItem.price, sellerAmount, protocolFee, royaltyFee, listedItem.seller, royaltyReceiver);
+            _processETHPayment(
+                listedItem.price, sellerAmount, protocolFee, royaltyFee, listedItem.seller, royaltyReceiver
+            );
         } else {
-            _processERC20Payment(listedItem.payToken, sellerAmount, protocolFee, royaltyFee, listedItem.seller, royaltyReceiver);
+            _processERC20Payment(
+                listedItem.payToken, sellerAmount, protocolFee, royaltyFee, listedItem.seller, royaltyReceiver
+            );
         }
 
         emit PropertySold(
@@ -370,16 +342,16 @@ contract PropChainMarketplace is AccessControl, ReentrancyGuard {
         if (msg.value != totalPrice) revert IncorrectPaymentAmount();
 
         if (protocolFee > 0) {
-            (bool feeSuccess, ) = feeRecipient.call{value: protocolFee}("");
+            (bool feeSuccess,) = feeRecipient.call{value: protocolFee}("");
             if (!feeSuccess) revert TransferFailed();
         }
 
         if (royaltyFee > 0 && royaltyReceiver != address(0)) {
-            (bool royaltySuccess, ) = royaltyReceiver.call{value: royaltyFee}("");
+            (bool royaltySuccess,) = royaltyReceiver.call{value: royaltyFee}("");
             if (!royaltySuccess) revert TransferFailed();
         }
 
-        (bool sellerSuccess, ) = seller.call{value: sellerAmount}("");
+        (bool sellerSuccess,) = seller.call{value: sellerAmount}("");
         if (!sellerSuccess) revert TransferFailed();
     }
 
@@ -406,12 +378,7 @@ contract PropChainMarketplace is AccessControl, ReentrancyGuard {
         token.safeTransferFrom(msg.sender, seller, sellerAmount);
     }
 
-    function _validateNFTListing(
-        address nftAddress,
-        uint256 tokenId,
-        uint256 amount,
-        bool isERC1155
-    ) private view {
+    function _validateNFTListing(address nftAddress, uint256 tokenId, uint256 amount, bool isERC1155) private view {
         if (isERC1155) {
             IERC1155 token1155 = IERC1155(nftAddress);
             if (token1155.balanceOf(msg.sender, tokenId) < amount) revert NotNFTOwner();
@@ -419,17 +386,17 @@ contract PropChainMarketplace is AccessControl, ReentrancyGuard {
         } else {
             IERC721 token721 = IERC721(nftAddress);
             if (token721.ownerOf(tokenId) != msg.sender) revert NotNFTOwner();
-            bool isApproved = token721.isApprovedForAll(msg.sender, address(this)) ||
-                token721.getApproved(tokenId) == address(this);
+            bool isApproved =
+                token721.isApprovedForAll(msg.sender, address(this)) || token721.getApproved(tokenId) == address(this);
             if (!isApproved) revert MarketplaceNotApproved();
         }
     }
 
-    function _calculateRoyalty(
-        address nftAddress,
-        uint256 tokenId,
-        uint256 price
-    ) private view returns (address receiver, uint256 royaltyFee) {
+    function _calculateRoyalty(address nftAddress, uint256 tokenId, uint256 price)
+        private
+        view
+        returns (address receiver, uint256 royaltyFee)
+    {
         if (IERC165(nftAddress).supportsInterface(type(IERC2981).interfaceId)) {
             (receiver, royaltyFee) = IERC2981(nftAddress).royaltyInfo(tokenId, price);
         }

@@ -48,13 +48,7 @@ contract PropChainMarketplaceTest is Test {
 
         // Despliegue del Marketplace pasándole los 5 parámetros requeridos
         vm.prank(admin);
-        marketplace = new PropChainMarketplace(
-            propChainToken,
-            usdc,
-            usdt,
-            address(complianceRegistry),
-            admin
-        );
+        marketplace = new PropChainMarketplace(propChainToken, usdc, usdt, address(complianceRegistry), admin);
 
         vm.deal(seller, 10 ether);
         vm.deal(buyer, 10 ether);
@@ -80,16 +74,9 @@ contract PropChainMarketplaceTest is Test {
     function test_ListProperty_RevertIf_IncorrectListingFee() public {
         vm.startPrank(seller);
         vm.expectRevert(PropChainMarketplace.IncorrectListingFee.selector);
-        
+
         // 6 argumentos
-        marketplace.listProperty(
-            mockNFT,
-            TOKEN_ID,
-            AMOUNT,
-            PRICE,
-            address(0),
-            false
-        );
+        marketplace.listProperty(mockNFT, TOKEN_ID, AMOUNT, PRICE, address(0), false);
         vm.stopPrank();
     }
 
@@ -99,11 +86,11 @@ contract PropChainMarketplaceTest is Test {
 
     function test_CancelListing_RevertIf_NotListingOwner() public {
         vm.startPrank(seller);
-        
+
         // 2 argumentos: nftAddress y tokenId
         vm.expectRevert(PropChainMarketplace.NotListingOwner.selector);
         marketplace.cancelListing(mockNFT, TOKEN_ID);
-        
+
         vm.stopPrank();
     }
 
@@ -113,11 +100,11 @@ contract PropChainMarketplaceTest is Test {
 
     function test_UpdateListingPrice_RevertIf_ZeroPrice() public {
         vm.startPrank(seller);
-        
+
         // 3 argumentos: nftAddress, tokenId y newPrice
         vm.expectRevert(PropChainMarketplace.PriceMustBeGreaterThanZero.selector);
         marketplace.updateListingPrice(mockNFT, TOKEN_ID, 0);
-        
+
         vm.stopPrank();
     }
 
@@ -127,11 +114,11 @@ contract PropChainMarketplaceTest is Test {
 
     function test_BuyProperty_RevertIf_NotListed() public {
         vm.startPrank(buyer);
-        
+
         // 2 argumentos: nftAddress y tokenId
         vm.expectRevert(PropChainMarketplace.NFTNotListed.selector);
         marketplace.buyProperty{value: PRICE}(mockNFT, TOKEN_ID);
-        
+
         vm.stopPrank();
     }
 }
