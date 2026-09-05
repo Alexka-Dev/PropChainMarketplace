@@ -25,8 +25,8 @@ contract ComplianceRegistryTest is Test {
 
     string public constant KYC_URI = "ipfs://QmKYCHashExample";
 
-    event UserVerified(address indexed user);
-    event UserUnverified(address indexed user);
+    event UserVerified(address indexed account, string kycHash);
+    event UserUnverified(address indexed user);  
 
     function setUp() public {
         vm.startPrank(admin);
@@ -55,8 +55,8 @@ contract ComplianceRegistryTest is Test {
     // ---------------------------------------------------------
 
     function test_VerifyUser_Success() public {
-        vm.expectEmit(true, false, false, false);
-        emit UserVerified(user1);
+        vm.expectEmit(true, false, false, true);
+        emit UserVerified(user1, KYC_URI);
 
         vm.prank(verifier);
         registry.verifyUser(user1, KYC_URI);

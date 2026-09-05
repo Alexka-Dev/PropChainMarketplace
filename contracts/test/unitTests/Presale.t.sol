@@ -62,11 +62,14 @@ contract PresaleTest is Test {
     uint256 constant INITIAL_TOKENS = 10_000_000 * 1e18; // 10M CPT
 
     event TokensPurchased(
-        address indexed buyer, address indexed assetAddress, uint256 amountSpent, uint256 tokensAllocated
+        address indexed buyer,
+        address indexed assetAddress,
+        uint256 indexed amountSpent,
+        uint256 tokensAllocated
     );
 
     event SetPaused(bool indexed isPaused);
-    event TokenPriceUpdated(uint256 newTokenPriceInUsd);
+    event TokenPriceUpdated(uint256 indexed newTokenPriceInUsd);
 
     receive() external payable {}
 
@@ -157,7 +160,7 @@ contract PresaleTest is Test {
         uint256 ethAmount = 2 ether;
         uint256 expectedTokens = 12_000 * 1e18;
 
-        vm.expectEmit(true, true, false, true);
+        vm.expectEmit(true, true, true, true);
         emit TokensPurchased(buyer, address(0), ethAmount, expectedTokens);
 
         vm.prank(buyer);
@@ -203,7 +206,7 @@ contract PresaleTest is Test {
         uint256 stableAmount = 500 * 1e6; // $500 USD -> 1,000 CPT
         uint256 expectedTokens = 1_000 * 1e18;
 
-        vm.expectEmit(true, true, false, true);
+        vm.expectEmit(true, true, true, true);
         emit TokensPurchased(buyer, address(usdt), stableAmount, expectedTokens);
 
         vm.prank(buyer);
@@ -226,7 +229,7 @@ contract PresaleTest is Test {
 
     function test_SetTokenPriceInUsd_Success() public {
         uint256 newPrice = 100000000; // $1.00 USD
-        vm.expectEmit(false, false, false, true);
+        vm.expectEmit(true, false, false, true);
         emit TokenPriceUpdated(newPrice);
 
         presale.setTokenPriceInUsd(newPrice);
