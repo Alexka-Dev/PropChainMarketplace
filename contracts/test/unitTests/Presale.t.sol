@@ -62,10 +62,7 @@ contract PresaleTest is Test {
     uint256 constant INITIAL_TOKENS = 10_000_000 * 1e18; // 10M CPT
 
     event TokensPurchased(
-        address indexed buyer,
-        address indexed assetAddress,
-        uint256 indexed amountSpent,
-        uint256 tokensAllocated
+        address indexed buyer, address indexed assetAddress, uint256 indexed amountSpent, uint256 tokensAllocated
     );
 
     event SetPaused(bool indexed isPaused);

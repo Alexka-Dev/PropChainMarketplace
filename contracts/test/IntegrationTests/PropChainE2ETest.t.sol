@@ -68,7 +68,7 @@ contract PropChainE2ETest is Test {
         vm.stopPrank();
     }
 
-   function test_E2E_FullUserJourney() public {
+    function test_E2E_FullUserJourney() public {
         vm.deal(buyer, 10 ether);
         vm.startPrank(buyer);
         presale.buyWithETH{value: 1 ether}();
@@ -77,12 +77,12 @@ contract PropChainE2ETest is Test {
         assertTrue(buyerBalance > 0, "Buyer should have received CPT tokens");
         vm.stopPrank();
 
-        vm.deal(seller, 1 ether); 
+        vm.deal(seller, 1 ether);
         vm.startPrank(seller);
         propertyNFT.mint(seller, 1);
         propertyNFT.approve(address(marketplace), 1);
 
-        uint256 listingPrice = 1_000 * 1e18; 
+        uint256 listingPrice = 1_000 * 1e18;
         marketplace.listProperty{value: 0.01 ether}(
             address(propertyNFT), 1, 1, listingPrice, address(propChainToken), false
         );
